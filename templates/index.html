@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block title %}Dashboard · BTC Forecaster{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-end mb-3">
+  <div>
+    <h1 class="h3 mb-0">Next-Day Volatility Forecast</h1>
+    <small class="text-secondary">As of {{ snapshot.date }}</small>
+  </div>
+  <span class="badge bg-warning text-dark align-self-start">Model R² {{ '%.3f'|format(holdout.r2) }} on holdout</span>
+</div>
+
+<!-- market snapshot -->
+<div class="row g-3 mb-4">
+  {% set cards = [
+    ('Close',          '$%s'|format('{:,.2f}'.format(snapshot.close)), '24h %+.2f%%'|format(snapshot.change_pct)),
+    ('Volume',         '$%s'|format('{:,.0f}'.format(snapshot.volume)), ''),
+    ('30-day volatility', snapshot.volatility_30d and ('%.2f%%'|format(snapshot.volatility_30d)) or '—', 'std of daily % returns'),
+    ('Fear & Greed',   snapshot.fear_greed and ('%.0f'|format(snapshot.fear_greed)) or '—', ''),
+  ] %}
+  {% for label, value, sub in cards %}
+  <div class="col-md-3">
+    <div class="card bg-dark border-secondary h-100">
+      <div class="card-body">
+        <div class="text-secondary small text-uppercase">{{ label }}</div>
+        <div class="fs-4 fw-semibold">{{ value }}</div>
+        {% if sub %}<div class="small text-warning">{{ sub }}</div>{% endif %}
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+<!-- forecast panel -->
+<div class="row g-4">
+  <div class="col-lg-5">
+    <div class="card bg-dark border-warning h-100">
+      <div class="card-body">
+        <h5 class="card-title text-warning">Tomorrow's predicted move</h5>
+        <p class="text-secondary small mb-3">
+          Expected absolute return (volatility forecast)
+        </p>
+        <div class="display-5 fw-bold text-warning mb-1">
+          ±{{ '%.2f'|format(forecast.expected_abs_return) }}%
+        </div>
+        <div class="text-secondary small mb-4">
+          ≈ σ = {{ '%.2f'|format(forecast.sigma) }}%
+        </div>
+
+        <table class="table table-dark table-sm">
+          <thead><tr><th>Confidence</th><th>Range</th></tr></thead>
+          <tbody>
+            <tr><td>68%</td><td>{{ '%.2f'|format(forecast.range_68[0]) }}% to +{{ '%.2f'|format(forecast.range_68[1]) }}%</td></tr>
+            <tr><td>90%</td><td>{{ '%.2f'|format(forecast.range_90[0]) }}% to +{{ '%.2f'|format(forecast.range_90[1]) }}%</td></tr>
+            <tr><td>95%</td><td>{{ '%.2f'|format(forecast.range_95[0]) }}% to +{{ '%.2f'|format(forecast.range_95[1]) }}%</td></tr>
+          </tbody>
+        </table>
+
+        <div class="alert alert-warning small mb-0">
+          Returns are <strong>fat-tailed</strong> — real extremes occur more often
+          than these normal-based ranges suggest.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-7">
+    <div class="card bg-dark border-secondary h-100">
+      <div class="card-body">
+        <h5 class="card-title">Recent price (last 180 days)</h5>
+        <canvas id="priceChart" height="140"></canvas>
+        <hr>
+        <h6 class="text-secondary">Feature inputs used by the model</h6>
+        <div class="row">
+          {% for k, v in features.items() %}
+          <div class="col-4">
+            <div class="small text-secondary">{{ k }}</div>
+            <div class="fw-semibold">{{ '%.3f'|format(v) }}</div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="alert alert-secondary mt-4">
+  <strong>Reality check.</strong> A model that just copies today's price already gets
+  R² ≈ 0.99 on price levels. This site deliberately forecasts <em>volatility</em>,
+  which is the only target the notebook found predictable. Direction remains a coin flip.
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>window.addEventListener('load', () => loadPriceChart('priceChart', 180));</script>
+{% endblock %}

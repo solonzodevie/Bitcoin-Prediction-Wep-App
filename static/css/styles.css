@@ -1,0 +1,44 @@
+body {
+  background: #0b0d10;
+  color: #e6e6e6;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  min-height: 100vh;
+}
+
+.navbar-brand { letter-spacing: .02em; }
+
+.card {
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0,0,0,.35);
+}
+
+.card-title { color: #f0b90b; }        /* Bitcoin-ish accent */
+
+.display-5, .fs-4 { color: #f0b90b; }
+
+code {
+  color: #f0b90b;
+  background: rgba(240,185,11,.08);
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+
+.table-dark {
+  --bs-table-bg: transparent;
+  --bs-table-border-color: #262a30;
+}
+
+.alert-warning {
+  background: rgba(240,185,11,.12);
+  border-color: rgba(240,185,11,.4);
+  color: #f0d979;
+}
+
+.alert-secondary {
+  background: rgba(255,255,255,.03);
+  border-color: #262a30;
+  color: #b9bdc3;
+}
+
+.text-success { color: #3ddc84 !important; }
+.text-danger  { color: #ff6b6b !important; }

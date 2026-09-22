@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}What-If · BTC Forecaster{% endblock %}
+
+{% block content %}
+<h1 class="h3 mb-1">What-If Scenario</h1>
+<p class="text-secondary">
+  Adjust the three inputs the volatility model actually uses and see how the
+  predicted range changes. All values are in percent (e.g. <code>vol30 = 3.2</code>).
+</p>
+
+<div class="row g-4">
+  <div class="col-lg-6">
+    <div class="card bg-dark border-secondary">
+      <div class="card-body">
+        <form id="predictForm">
+          {% for k, v in features.items() %}
+          <div class="mb-3">
+            <label class="form-label" for="input-{{ k }}">{{ k }}</label>
+            <input type="number" step="0.01" class="form-control bg-dark text-light border-secondary"
+                   id="input-{{ k }}" name="{{ k }}" value="{{ v }}">
+          </div>
+          {% endfor %}
+          <button class="btn btn-warning w-100" type="submit">Predict</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+    <div class="card bg-dark border-warning h-100">
+      <div class="card-body">
+        <h5 class="card-title text-warning">Result</h5>
+        <div id="resultPlaceholder" class="text-secondary">Submit the form to see a forecast.</div>
+        <div id="resultPanel" class="d-none">
+          <div class="display-5 fw-bold text-warning mb-1">
+            ±<span id="rExpected">—</span>%
+          </div>
+          <div class="text-secondary small mb-4">
+            σ = <span id="rSigma">—</span>%
+          </div>
+          <table class="table table-dark table-sm">
+            <thead><tr><th>Confidence</th><th>Range</th></tr></thead>
+            <tbody>
+              <tr><td>68%</td><td><span id="r68">—</span></td></tr>
+              <tr><td>90%</td><td><span id="r90">—</span></td></tr>
+              <tr><td>95%</td><td><span id="r95">—</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
